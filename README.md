@@ -1,2 +1,3 @@
 # OpenHUB6
-Open source firmware builds for HUB6 Safe
+OpenHUB6 is open, developer-friendly firmware for Safe
+This project is not affiliated with or endorsed by HUB6 Inc.
