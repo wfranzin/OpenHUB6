@@ -1,0 +1,85 @@
+*******************************************
+*        U-Boot 1.1.4  (Jun  3 2014)        *
+*******************************************
+
+AP121 (AR9331) U-Boot for Dragino v2 MS14
+
+DRAM:   64 MB
+FLASH:  Winbond W25Q128 (16 MB)
+CLOCKS: 400/400/200/33 MHz (CPU/RAM/AHB/SPI)
+
+LED on during eth initialization...
+
+Hit any key to stop autobooting:  1   0 
+
+dr_boot> z   ?
+
+?        - alias for 'help'
+boot     - boot default, i.e., run 'bootcmd'
+bootd    - boot default, i.e., run 'bootcmd'
+bootm    - boot application image from memory
+clearclk - remove PLL and clocks configuration from FLASH
+cp       - memory copy
+defenv   - reset environment variables to their default values
+dhcp     - invoke DHCP client to obtain IP/boot params
+echo     - echo args to console
+erase    - erase FLASH memory
+exit     - exit script
+go       - start application at address 'addr'
+help     - print embedded help
+httpd    - start www server for firmware recovery
+iminfo   - print firmware header
+itest    - return true/false on integer compare
+md       - memory display
+mm       - memory modify (auto-incrementing)
+mtest    - RAM test
+mw       - memory write (fill)
+nm       - memory modify (constant address)
+ping     - send ICMP ECHO_REQUEST to network host
+printenv - print environment variables
+printmac - print MAC addresses stored in FLASH
+reset    - perform RESET of the CPU
+run      - run commands in an environment variable
+saveenv  - save environment variables to FLASH
+setclk   - select clocks configuration from predefined list
+setenv   - set environment variables
+setmac   - save new MAC address in FLASH
+sntp     - send NTP request to NTP server
+startnc  - start net console
+startsc  - start serial console
+test     - minimal test like /bin/sh
+tftpboot - boot image via network using TFTP protocol
+version  - print U-Boot version
+
+dr_boot> version
+
+U-Boot 1.1.4  (Jun  3 2014)
+
+dr_boot> printenv
+
+bootargs=console=ttyS0,115200 root=31:02 rootfstype=squashfs init=/sbin/init mtdparts=ar7240-nor0:192k(u-boot),64k(u-boot-env),16064k(firmware),64k(ART)
+bootdelay=1
+baudrate=115200
+bootfile="firmware.bin"
+loadaddr=0x80800000
+ncport=6666
+uboot_addr=0x9F000000
+uboot_name=uboot.bin
+uboot_size=0x30000
+uboot_upg=if ping $serverip; then tftp $loadaddr $uboot_name && if itest.l $filesize == $uboot_size; then erase $uboot_addr +$filesize && cp.b $loadaddr $uboot_addr $filesize && echo OK!; else echo ERROR! Wrong file size!; fi; else ERROR! Server not reachable!; fi
+firmware_addr=0x9F040000
+firmware_name=firmware.bin
+firmware_upg=if ping $serverip; then tftp $loadaddr $firmware_name && erase $firmware_addr +$filesize && cp.b $loadaddr $firmware_addr $filesize && echo OK!; else ERROR! Server not reachable!; fi
+ethact=eth0
+filesize=4a0000
+fileaddr=81000000
+serverip=192.168.255.2
+bootcmd=bootm 0x9f040000
+ipaddr=192.168.255.1
+stdin=serial
+stdout=serial
+stderr=serial
+
+Environment size: 968/32764 bytes
+
+dr_boot>

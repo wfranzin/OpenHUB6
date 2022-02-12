@@ -1,0 +1,195 @@
+*******************************************
+*        U-Boot 1.1.4  (Jun  3 2014)        *
+*******************************************
+
+AP121 (AR9331) U-Boot for Dragino v2 MS14
+
+DRAM:   64 MB
+FLASH:  Winbond W25Q128 (16 MB)
+CLOCKS: 400/400/200/33 MHz (CPU/RAM/AHB/SPI)
+
+LED on during eth initialization...
+
+Hit any key to stop autobooting:  1   0 
+
+Booting image at: 0x9F040000
+
+   Image name:   MIPS OpenWrt Linux-3.18.45
+   Created:      2020-08-24  15:18:52 UTC
+   Image type:   MIPS Linux Kernel Image (lzma compressed)
+   Data size:    1190135 Bytes = 1.1 MB
+   Load address: 0x80060000
+   Entry point:  0x80060000
+
+Uncompressing kernel image... OK!
+Starting kernel...
+
+Linux version 3.18.45 (embedded@ip-172-31-14-91) (gcc version 4.8.3 (OpenWrt/Linaro GCC 4.8-2014.04 unknown) ) #40 Mon Aug 24 15:18:43 UTC 2020
+bootconsole [early0] enabled
+CPU0 revision is: 00019374 (MIPS 24Kc)
+SoC: Atheros AR9330 rev 1
+Determined physical RAM map:
+ memory: 04000000 @ 00000000 (usable)
+Initrd not found or empty - disabling initrd
+Zone ranges:
+  Normal   [mem 0x00000000-0x03ffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x00000000-0x03ffffff]
+Initmem setup node 0 [mem 0x00000000-0x03ffffff]
+Primary instruction cache 64kB, VIPT, 4-way, linesize 32 bytes.
+Primary data cache 32kB, 4-way, VIPT, cache aliases, linesize 32 bytes
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 16256
+Kernel command line:  board=DRAGINO2 console=ttyATH0,115200 mtdparts=spi0.0:256k(u-boot)ro,16000k(firmware),64k(config),64k(art)ro rootfstype=squashfs,jffs2 noinitrd
+PID hash table entries: 256 (order: -2, 1024 bytes)
+Dentry cache hash table entries: 8192 (order: 3, 32768 bytes)
+Inode-cache hash table entries: 4096 (order: 2, 16384 bytes)
+Writing ErrCtl register=00000000
+Readback ErrCtl register=00000000
+Memory: 60752K/65536K available (2613K kernel code, 150K rwdata, 548K rodata, 264K init, 189K bss, 4784K reserved)
+SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+NR_IRQS:51
+Clocks: CPU:400.000MHz, DDR:400.000MHz, AHB:200.000MHz, Ref:25.000MHz
+Calibrating delay loop... 265.42 BogoMIPS (lpj=1327104)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+NET: Registered protocol family 16
+MIPS: machine is Dragino Dragino v2
+Switched to clocksource MIPS
+NET: Registered protocol family 2
+TCP established hash table entries: 1024 (order: 0, 4096 bytes)
+TCP bind hash table entries: 1024 (order: 0, 4096 bytes)
+TCP: Hash tables configured (established 1024 bind 1024)
+TCP: reno registered
+UDP hash table entries: 256 (order: 0, 4096 bytes)
+UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+NET: Registered protocol family 1
+futex hash table entries: 256 (order: -1, 3072 bytes)
+squashfs: version 4.0 (2009/01/31) Phillip Lougher
+jffs2: version 2.2 (NAND) (SUMMARY) (LZMA) (RTIME) (CMODE_PRIORITY) (c) 2001-2006 Red Hat, Inc.
+msgmni has been set to 118
+io scheduler noop registered
+io scheduler deadline registered (default)
+Serial: 8250/16550 driver, 16 ports, IRQ sharing enabled
+ar933x-uart: ttyATH0 at MMIO 0x18020000 (irq = 11, base_baud = 1562500) is a AR933X UART
+console [ttyATH0] enabled
+console [ttyATH0] enabled
+bootconsole [early0] disabled
+bootconsole [early0] disabled
+m25p80 spi0.0: found w25q128, expected m25p80
+m25p80 spi0.0: w25q128 (16384 Kbytes)
+4 cmdlinepart partitions found on MTD device spi0.0
+Creating 4 MTD partitions on "spi0.0":
+0x000000000000-0x000000040000 : "u-boot"
+0x000000040000-0x000000fe0000 : "firmware"
+2 uimage-fw partitions found on MTD device firmware
+0x000000040000-0x000000170000 : "kernel"
+0x000000170000-0x000000fe0000 : "rootfs"
+mtd: device 3 (rootfs) set to be root filesystem
+1 squashfs-split partitions found on MTD device rootfs
+0x000000be0000-0x000000fe0000 : "rootfs_data"
+0x000000fe0000-0x000000ff0000 : "config"
+0x000000ff0000-0x000001000000 : "art"
+libphy: ag71xx_mdio: probed
+ag71xx-mdio.1: Found an AR7240/AR9330 built-in switch
+eth0: Atheros AG71xx at 0xba000000, irq 5, mode:GMII
+ag71xx ag71xx.0: connected to PHY at ag71xx-mdio.1:04 [uid=004dd041, driver=Generic PHY]
+eth1: Atheros AG71xx at 0xb9000000, irq 4, mode:MII
+TCP: cubic registered
+NET: Registered protocol family 17
+bridge: automatic filtering via arp/ip/ip6tables has been deprecated. Update your scripts to load br_netfilter if you need this.
+8021q: 802.1Q VLAN Support v1.8
+VFS: Mounted root (squashfs filesystem) readonly on device 31:3.
+Freeing unused kernel memory: 264K (8039e000 - 803e0000)
+init: Console is alive
+init: - watchdog -
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+SCSI subsystem initialized
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+ehci-platform: EHCI generic platform driver
+ehci-platform ehci-platform: EHCI Host Controller
+ehci-platform ehci-platform: new USB bus registered, assigned bus number 1
+ehci-platform ehci-platform: irq 3, io mem 0x1b000000
+ehci-platform ehci-platform: USB 2.0 started, EHCI 1.00
+hub 1-0:1.0: USB hub found
+hub 1-0:1.0: 1 port detected
+ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+ohci-platform: OHCI generic platform driver
+uhci_hcd: USB Universal Host Controller Interface driver
+usbcore: registered new interface driver usb-storage
+input: gpio-keys-polled as /devices/platform/gpio-keys-polled/input/input0
+usb 1-1: new high-speed USB device number 2 using ehci-platform
+init: - preinit -
+hub 1-1:1.0: USB hub found
+hub 1-1:1.0: 4 ports detected
+usb 1-1.3: new full-speed USB device number 3 using ehci-platform
+random: procd urandom read with 13 bits of entropy available
+Press the [f] key and hit [enter] to enter failsafe mode
+Press the [1], [2], [3] or [4] key and hit [enter] to select the debug level
+mount_root: loading kmods from internal overlay
+jffs2: notice: (381) jffs2_build_xattr_subsystem: complete building xattr subsystem, 0 of xdatum (0 unchecked, 0 orphan) and 0 of xref (0 dead, 0 orphan) found.
+block: attempting to load /tmp/jffs_cfg/upper/etc/config/fstab
+block: extroot: not configured
+jffs2: notice: (378) jffs2_build_xattr_subsystem: complete building xattr subsystem, 0 of xdatum (0 unchecked, 0 orphan) and 0 of xref (0 dead, 0 orphan) found.
+block: attempting to load /tmp/jffs_cfg/upper/etc/config/fstab
+block: extroot: not configured
+mount_root: switching to jffs2 overlay
+procd: - early -
+procd: - watchdog -
+procd: - ubus -
+Command failed: Not found
+procd: - init -
+Please press Enter to activate this console.
+
+(none) login: NET: Registered protocol family 10
+loop: module loaded
+ip6_tables: (C) 2000-2006 Netfilter Core Team
+batman_adv: B.A.T.M.A.N. advanced 2014.4.0 (compatibility version 15) loaded
+u32 classifier
+    input device check on
+    Actions configured
+Mirror/redirect action on
+Loading modules backported from Linux version v4.4-rc5-1913-gc8fdf68
+Backport generated by backports.git backports-20151218-0-g2f58d9d
+ip_tables: (C) 2000-2006 Netfilter Core Team
+nf_conntrack version 0.5.0 (953 buckets, 3812 max)
+nf_conntrack_rtsp v0.7 loading
+nf_nat_rtsp v0.7 loading
+usbcore: registered new interface driver usbserial
+usbcore: registered new interface driver usbserial_generic
+usbserial: USB Serial support registered for generic
+xt_time: kernel timezone is -0000
+usbcore: registered new interface driver ftdi_sio
+usbserial: USB Serial support registered for FTDI USB Serial Device
+ftdi_sio 1-1.3:1.0: FTDI USB Serial Device converter detected
+usb 1-1.3: Detected FT232RL
+usb 1-1.3: FTDI USB Serial Device converter now attached to ttyUSB0
+PPP generic driver version 2.4.2
+NET: Registered protocol family 24
+usbcore: registered new interface driver option
+usbserial: USB Serial support registered for GSM modem (1-port)
+ieee80211 phy0: Atheros AR9330 Rev:1 mem=0xb8100000, irq=2
+random: nonblocking pool is initialized
+IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+
+
+Login timed outPlease press Enter to activate this console.
+
+HUB6-A8590B3E login: root
+Password: 
+Login incorrect
+HUB6-A8590B3E login: usb 1-1.1: new high-speed USB device number 4 using ehci-platform
+option 1-1.1:1.0: GSM modem (1-port) converter detected
+usb 1-1.1: GSM modem (1-port) converter now attached to ttyUSB1
+option 1-1.1:1.1: GSM modem (1-port) converter detected
+usb 1-1.1: GSM modem (1-port) converter now attached to ttyUSB2
+option 1-1.1:1.2: GSM modem (1-port) converter detected
+usb 1-1.1: GSM modem (1-port) converter now attached to ttyUSB3
+option 1-1.1:1.3: GSM modem (1-port) converter detected
+usb 1-1.1: GSM modem (1-port) converter now attached to ttyUSB4
+
+
+Login timed outPlease press Enter to activate this console.
