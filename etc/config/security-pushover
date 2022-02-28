@@ -1,5 +1,0 @@
-
-config info 'api'
-	option user_key 'PASTE USER KEY HERE'
-	option api_key 'PASTE API KEY HERE'
-
