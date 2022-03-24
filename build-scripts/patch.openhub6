@@ -1,0 +1,364 @@
+diff --git a/target/linux/ar71xx/base-files/etc/board.d/01_leds b/target/linux/ar71xx/base-files/etc/board.d/01_leds
+index bd589c1cff..e055fe50e2 100755
+--- a/target/linux/ar71xx/base-files/etc/board.d/01_leds
++++ b/target/linux/ar71xx/base-files/etc/board.d/01_leds
+@@ -294,7 +294,8 @@ db120)
+ dr344)
+ 	ucidef_set_led_netdev "lan" "LAN" "$board:green:lan" "eth1"
+ 	;;
+-dragino2)
++dragino2|\
++openhub6)
+ 	ucidef_set_led_wlan "wlan" "WLAN" "$board:red:wlan" "phy0tpt"
+ 	ucidef_set_led_netdev "lan" "LAN" "$board:red:lan" "eth0"
+ 	ucidef_set_led_netdev "wan" "WAN" "$board:red:wan" "eth1"
+diff --git a/target/linux/ar71xx/base-files/etc/diag.sh b/target/linux/ar71xx/base-files/etc/diag.sh
+index 29bf2ada40..a409549155 100644
+--- a/target/linux/ar71xx/base-files/etc/diag.sh
++++ b/target/linux/ar71xx/base-files/etc/diag.sh
+@@ -207,7 +207,8 @@ get_status_led() {
+ 		status_led="$board:green:sig4"
+ 		;;
+ 	dragino2|\
+-	oolite-v1)
++	oolite-v1|\
++	openhub6)
+ 		status_led="$board:red:system"
+ 		;;
+ 	dw33d|\
+diff --git a/target/linux/ar71xx/base-files/lib/ar71xx.sh b/target/linux/ar71xx/base-files/lib/ar71xx.sh
+index 044ef4eae5..b1eb522fd7 100755
+--- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
++++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
+@@ -851,6 +851,9 @@ ar71xx_board_detect() {
+ 	*"Dragino v2")
+ 		name="dragino2"
+ 		;;
++	*"OpenHub6")
++		name="openhub6"
++		;;
+ 	*"DW33D")
+ 		name="dw33d"
+ 		;;
+diff --git a/target/linux/ar71xx/config-4.14 b/target/linux/ar71xx/config-4.14
+index 9a524fae43..12e70e6625 100644
+--- a/target/linux/ar71xx/config-4.14
++++ b/target/linux/ar71xx/config-4.14
+@@ -100,6 +100,7 @@ CONFIG_ATH79=y
+ # CONFIG_ATH79_MACH_DR344 is not set
+ # CONFIG_ATH79_MACH_DR531 is not set
+ # CONFIG_ATH79_MACH_DRAGINO2 is not set
++# CONFIG_ATH79_MACH_OPENHUB6 is not set
+ # CONFIG_ATH79_MACH_E1700AC_V2 is not set
+ # CONFIG_ATH79_MACH_E2100L is not set
+ # CONFIG_ATH79_MACH_E558_V2 is not set
+diff --git a/target/linux/ar71xx/files/arch/mips/ath79/Kconfig.openwrt b/target/linux/ar71xx/files/arch/mips/ath79/Kconfig.openwrt
+index 6fd78c46a0..f578987eaf 100644
+--- a/target/linux/ar71xx/files/arch/mips/ath79/Kconfig.openwrt
++++ b/target/linux/ar71xx/files/arch/mips/ath79/Kconfig.openwrt
+@@ -1015,6 +1015,16 @@ config ATH79_MACH_KOALA
+ 	select ATH79_DEV_M25P80
+ 	select ATH79_DEV_WMAC
+ 
++config ATH79_MACH_OPENHUB6
++	bool "OPENHUB6 support"
++	select SOC_AR933X
++	select ATH79_DEV_M25P80
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_WMAC
++	select ATH79_DEV_ETH
++	select ATH79_DEV_USB
++
+ config ATH79_MACH_WAM250
+ 	bool "Samsung WAM250 support"
+ 	select SOC_AR934X
+diff --git a/target/linux/ar71xx/files/arch/mips/ath79/Makefile b/target/linux/ar71xx/files/arch/mips/ath79/Makefile
+index 0265b3d818..73a0dfcf6f 100644
+--- a/target/linux/ar71xx/files/arch/mips/ath79/Makefile
++++ b/target/linux/ar71xx/files/arch/mips/ath79/Makefile
+@@ -175,6 +175,7 @@ obj-$(CONFIG_ATH79_MACH_OM5P_ACv2)		+= mach-om5pacv2.o
+ obj-$(CONFIG_ATH79_MACH_OMY_G1)			+= mach-omy-g1.o
+ obj-$(CONFIG_ATH79_MACH_OMY_X1)			+= mach-omy-x1.o
+ obj-$(CONFIG_ATH79_MACH_ONION_OMEGA)		+= mach-onion-omega.o
++obj-$(CONFIG_ATH79_MACH_OPENHUB6)		+= mach-openhub6.o
+ obj-$(CONFIG_ATH79_MACH_PB42)			+= mach-pb42.o
+ obj-$(CONFIG_ATH79_MACH_PB44)			+= mach-pb44.o
+ obj-$(CONFIG_ATH79_MACH_PQI_AIR_PEN)		+= mach-pqi-air-pen.o
+diff --git a/target/linux/ar71xx/files/arch/mips/ath79/mach-dragino2.c b/target/linux/ar71xx/files/arch/mips/ath79/mach-dragino2.c
+index 95bd6f41a3..219d3189d7 100644
+--- a/target/linux/ar71xx/files/arch/mips/ath79/mach-dragino2.c
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-dragino2.c
+@@ -27,6 +27,14 @@
+ #define DRAGINO2_GPIO_LED_LAN		13
+ #define DRAGINO2_GPIO_LED_WAN		17
+ 
++/*
++ * The following GPIO are specific to the HUB6 SAFE box
++ * (located on the top of the box (3 LED connected in //)
++ */
++#define DRAGINO2_OPENHUB6_GPIO_LED_BLUE_SYS	26
++#define DRAGINO2_OPENHUB6_GPIO_LED_GREEN_SYS	27
++#define DRAGINO2_OPENHUB6_GPIO_LED_RED_SYS	28
++
+ /*
+  * The following GPIO is named "SYS" on newer revisions of the the board.
+  * It was previously used to indicate USB activity, even though it was
+@@ -66,6 +74,24 @@ static struct gpio_led dragino2_leds_gpio[] __initdata = {
+ 		.gpio		= DRAGINO2_GPIO_LED_SYS,
+ 		.active_low	= 0,
+ 	},
++#if 0
++	{
++		.name		= "openhub6:red:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_RED_SYS,
++		.active_low	= 0,
++	},
++#endif
++	{
++		.name		= "openhub6:green:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_GREEN_SYS,
++		.active_low	= 0,
++	},
++	{
++		.name		= "openhub6:blue:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_BLUE_SYS,
++		.active_low	= 0,
++	},
++
+ };
+ 
+ static struct gpio_keys_button dragino2_gpio_keys[] __initdata = {
+@@ -96,7 +122,7 @@ static void __init dragino2_common_setup(void)
+ 			    art + DRAGINO2_WMAC_MAC_OFFSET);
+ 
+ 	ath79_init_mac(ath79_eth0_data.mac_addr, art + DRAGINO2_MAC0_OFFSET, 0);
+-	ath79_init_mac(ath79_eth1_data.mac_addr, art + DRAGINO2_MAC1_OFFSET, 0);
++//	ath79_init_mac(ath79_eth1_data.mac_addr, art + DRAGINO2_MAC1_OFFSET, 0);
+ 
+ 	ath79_register_mdio(0, 0x0);
+ 
+@@ -108,7 +134,7 @@ static void __init dragino2_common_setup(void)
+ 				    AR933X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
+ 
+ 	/* LAN port */
+-	ath79_register_eth(1);
++//	ath79_register_eth(1);
+ 
+ 	/* WAN port */
+ 	ath79_register_eth(0);
+diff --git a/target/linux/ar71xx/files/arch/mips/ath79/machtypes.h b/target/linux/ar71xx/files/arch/mips/ath79/machtypes.h
+index 900b4ec87b..b8e09a9744 100644
+--- a/target/linux/ar71xx/files/arch/mips/ath79/machtypes.h
++++ b/target/linux/ar71xx/files/arch/mips/ath79/machtypes.h
+@@ -188,6 +188,7 @@ enum ath79_mach_type {
+ 	ATH79_MACH_OMY_G1,			/* OMYlink OMY-G1 */
+ 	ATH79_MACH_OMY_X1,			/* OMYlink OMY-X1 */
+ 	ATH79_MACH_ONION_OMEGA,			/* ONION OMEGA */
++	ATH79_MACH_OPENHUB6,			/* OpenHub6 */
+ 	ATH79_MACH_PACKET_SQUIRREL,		/* Hak5 Packet Squirrel */
+ 	ATH79_MACH_PB42,			/* Atheros PB42 */
+ 	ATH79_MACH_PB44,			/* Atheros PB44 reference board */
+diff --git a/target/linux/ar71xx/generic/config-default b/target/linux/ar71xx/generic/config-default
+index 25b58ae91e..6cac8c40fc 100644
+--- a/target/linux/ar71xx/generic/config-default
++++ b/target/linux/ar71xx/generic/config-default
+@@ -134,6 +134,7 @@ CONFIG_ATH79_MACH_PB42=y
+ CONFIG_ATH79_MACH_PB44=y
+ CONFIG_ATH79_MACH_PQI_AIR_PEN=y
+ CONFIG_ATH79_MACH_QIHOO_C301=y
++CONFIG_ATH79_MACH_OPENHUB6=y
+ CONFIG_ATH79_MACH_R36A=y
+ CONFIG_ATH79_MACH_R602N=y
+ CONFIG_ATH79_MACH_RE355=y
+diff --git a/target/linux/ar71xx/image/generic.mk b/target/linux/ar71xx/image/generic.mk
+index 7347b21cfe..7e8d32d90f 100644
+--- a/target/linux/ar71xx/image/generic.mk
++++ b/target/linux/ar71xx/image/generic.mk
+@@ -951,6 +951,16 @@ define Device/onion-omega
+ endef
+ TARGET_DEVICES += onion-omega
+ 
++define Device/openhub6
++  BOARDNAME := OPENHUB6
++  CONSOLE := ttyATH0,115200
++  DEVICE_PACKAGES := kmod-usb-core kmod-usb2 kmod-usb-ledtrig-usbport
++  DEVICE_TITLE := OpenHub6 (Safe)
++  IMAGE_SIZE := 16000k
++  MTDPARTS := spi0.0:256k(u-boot)ro,16000k(firmware),64k(config)ro,64k(art)ro
++endef
++TARGET_DEVICES += openhub6
++
+ define Device/sc1750
+   DEVICE_TITLE := Abicom SC1750
+   DEVICE_PACKAGES := kmod-usb-core kmod-usb2 kmod-usb-ledtrig-usbport
+diff --git a/target/linux/ar71xx/files/arch/mips/ath79/mach-openhub6.c b/target/linux/ar71xx/files/arch/mips/ath79/mach-openhub6.c
+new file mode 100644
+index 0000000000..18cdc83a46
+--- /dev/null
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-openhub6.c
+@@ -0,0 +1,164 @@
++/*
++ *  OPENHUB6 board support, based on Dragino V2 board support
++ *
++ *  Copyright (C) 2011-2012 Gabor Juhos <juhosg@openwrt.org>
++ *  Copyright (C) 2012 Elektra Wagenrad <elektra@villagetelco.org>
++ *  Copyright (C) 2014 Vittorio Gambaletta <openwrt@vittgam.net>
++ *  Copyright (C) 2022 Mathieu Rondonneau <mathieu.rondonneau@gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify it
++ *  under the terms of the GNU General Public License version 2 as published
++ *  by the Free Software Foundation.
++ */
++
++#include <linux/gpio.h>
++#include <asm/mach-ath79/ath79.h>
++#include <asm/mach-ath79/ar71xx_regs.h>
++#include "common.h"
++#include "dev-eth.h"
++#include "dev-gpio-buttons.h"
++#include "dev-leds-gpio.h"
++#include "dev-m25p80.h"
++#include "dev-spi.h"
++#include "dev-usb.h"
++#include "dev-wmac.h"
++#include "machtypes.h"
++
++#define DRAGINO2_GPIO_LED_WLAN		0
++#define DRAGINO2_GPIO_LED_LAN		13
++#define DRAGINO2_GPIO_LED_WAN		17
++
++/*
++ * The following GPIO are specific to the HUB6 SAFE box
++ * (located on the top of the box (3 LED connected in //)
++ */
++#define DRAGINO2_OPENHUB6_GPIO_LED_BLUE_SYS	26
++#define DRAGINO2_OPENHUB6_GPIO_LED_GREEN_SYS	27
++#define DRAGINO2_OPENHUB6_GPIO_LED_RED_SYS	28
++
++/*
++ * The following GPIO is named "SYS" on newer revisions of the the board.
++ * It was previously used to indicate USB activity, even though it was
++ * named "Router".
++ */
++
++#define DRAGINO2_GPIO_LED_SYS		28
++#define DRAGINO2_GPIO_BTN_JUMPSTART	11
++#define DRAGINO2_GPIO_BTN_RESET		12
++
++#define DRAGINO2_KEYS_POLL_INTERVAL	20	/* msecs */
++#define DRAGINO2_KEYS_DEBOUNCE_INTERVAL	(3 * DRAGINO2_KEYS_POLL_INTERVAL)
++
++#define DRAGINO2_MAC0_OFFSET		0x0000
++#define DRAGINO2_MAC1_OFFSET		0x0006
++#define DRAGINO2_CALDATA_OFFSET		0x1000
++#define DRAGINO2_WMAC_MAC_OFFSET	0x1002
++
++static struct gpio_led dragino2_leds_gpio[] __initdata = {
++	{
++		.name		= "dragino2:red:wlan",
++		.gpio		= DRAGINO2_GPIO_LED_WLAN,
++		.active_low	= 0,
++	},
++	{
++		.name		= "dragino2:red:wan",
++		.gpio		= DRAGINO2_GPIO_LED_WAN,
++		.active_low	= 1,
++	},
++	{
++		.name		= "dragino2:red:lan",
++		.gpio		= DRAGINO2_GPIO_LED_LAN,
++		.active_low	= 1,
++	},
++	{
++		.name		= "dragino2:red:system",
++		.gpio		= DRAGINO2_GPIO_LED_SYS,
++		.active_low	= 0,
++	},
++#if 0
++	/* TODO: Use this one once all the script are cleanedup to not used the dragino system one */
++	{
++		.name		= "openhub6:red:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_RED_SYS,
++		.active_low	= 0,
++	},
++#endif
++	{
++		.name		= "openhub6:green:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_GREEN_SYS,
++		.active_low	= 0,
++	},
++	{
++		.name		= "openhub6:blue:system",
++		.gpio		= DRAGINO2_OPENHUB6_GPIO_LED_BLUE_SYS,
++		.active_low	= 0,
++	},
++
++};
++
++static struct gpio_keys_button dragino2_gpio_keys[] __initdata = {
++	{
++		.desc		= "jumpstart button",
++		.type		= EV_KEY,
++		.code		= KEY_WPS_BUTTON,
++		.debounce_interval = DRAGINO2_KEYS_DEBOUNCE_INTERVAL,
++		.gpio		= DRAGINO2_GPIO_BTN_JUMPSTART,
++		.active_low	= 1,
++	},
++	{
++		.desc		= "reset button",
++		.type		= EV_KEY,
++		.code		= KEY_RESTART,
++		.debounce_interval = DRAGINO2_KEYS_DEBOUNCE_INTERVAL,
++		.gpio		= DRAGINO2_GPIO_BTN_RESET,
++		.active_low	= 1,
++	}
++};
++
++static void __init dragino2_common_setup(void)
++{
++	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
++
++	ath79_register_m25p80(NULL);
++	ath79_register_wmac(art + DRAGINO2_CALDATA_OFFSET,
++			    art + DRAGINO2_WMAC_MAC_OFFSET);
++
++	ath79_init_mac(ath79_eth0_data.mac_addr, art + DRAGINO2_MAC0_OFFSET, 0);
++	ath79_init_mac(ath79_eth1_data.mac_addr, art + DRAGINO2_MAC1_OFFSET, 0);
++
++	ath79_register_mdio(0, 0x0);
++
++	/* Enable GPIO13, GPIO14, GPIO15, GPIO16 and GPIO17 */
++	ath79_gpio_function_disable(AR933X_GPIO_FUNC_ETH_SWITCH_LED0_EN |
++				    AR933X_GPIO_FUNC_ETH_SWITCH_LED1_EN |
++				    AR933X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
++				    AR933X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
++				    AR933X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
++
++	/* LAN port */
++	ath79_register_eth(1);
++
++	/* WAN port */
++	ath79_register_eth(0);
++
++	/* Enable GPIO26 and GPIO27 */
++	ath79_reset_wr(AR933X_RESET_REG_BOOTSTRAP,
++		       ath79_reset_rr(AR933X_RESET_REG_BOOTSTRAP) |
++		       AR933X_BOOTSTRAP_MDIO_GPIO_EN);
++}
++
++static void __init dragino2_setup(void)
++{
++	dragino2_common_setup();
++
++	ath79_register_leds_gpio(-1, ARRAY_SIZE(dragino2_leds_gpio),
++				 dragino2_leds_gpio);
++	ath79_register_gpio_keys_polled(-1, DRAGINO2_KEYS_POLL_INTERVAL,
++					ARRAY_SIZE(dragino2_gpio_keys),
++					dragino2_gpio_keys);
++	ath79_register_usb();
++}
++
++MIPS_MACHINE(ATH79_MACH_OPENHUB6, "OPENHUB6", "OpenHub6 OpenHub6",
++	     dragino2_setup);
++
