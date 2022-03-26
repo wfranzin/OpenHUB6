@@ -28,9 +28,9 @@ define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)/etc
 	mkdir -p $(PKG_BUILD_DIR)/root
 	mkdir -p $(PKG_BUILD_DIR)/usr
-	$(CP) ./files/etc/* $(PKG_BUILD_DIR)/etc
-	$(CP) ./files/root/* $(PKG_BUILD_DIR)/root
-	$(CP) ./files/usr/* $(PKG_BUILD_DIR)/usr
+	$(CP) -rf ./files/etc/* $(PKG_BUILD_DIR)/etc
+	$(CP) -rf ./files/root/* $(PKG_BUILD_DIR)/root
+	$(CP) -rf ./files/usr/* $(PKG_BUILD_DIR)/usr
 endef
 
 define Build/Compile
