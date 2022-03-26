@@ -86,11 +86,11 @@ echo ""
 echo "Move files to $IMAGE_PATH..."
 cp ./$TARGET_PATH/*-squashfs-sysupgrade.bin $IMAGE_PATH/${APP^^}-$VERSION-$DATE.bin
 
+cd $REPO_PATH
+
 if [ -f openwrt_tftp.sh ];then
 ./openwrt_tftp.sh $IMAGE_PATH/${APP^^}-$VERSION-$DATE.bin
 fi
-
-cd $REPO_PATH
 
 echo ""
 echo "OpenHub6 build done, The image can be found at $IMAGE_PATH"
