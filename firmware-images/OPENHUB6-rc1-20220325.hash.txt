@@ -1,0 +1,3 @@
+Provided as-is, where is, use at your own risk. Have fun!
+6a2ec58637d14cbc3baa1a69bae7f719710379e9dba63adf6b6cd975ad540af6  ../firmware-images/OPENHUB6-rc1-20220325.bin
+717032c0b1bedf342e42c703f650b803  ../firmware-images/OPENHUB6-rc1-20220325.bin
