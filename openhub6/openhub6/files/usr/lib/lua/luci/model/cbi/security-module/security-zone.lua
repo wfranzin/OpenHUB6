@@ -1,5 +1,7 @@
 m = Map("security-zone", translate("Zone Labels"), translate(""))
 
+ts = m:section(TypedSection, "info", "Motion Sensors must include the word 'Motion' to send or not send Notifications"); ts.anonymous=true;
+
 d = m:section(TypedSection, "info", "Zones 1 to 16")
 a = d:option(Value, "001", "Zone 1"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "002", "Zone 2"); a.optional=false; a.rmempty = false;
